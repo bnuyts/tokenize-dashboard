@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tokenize Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .contract-card {
+            transition: all 0.3s ease;
+        }
+        .contract-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-robot text-blue-600 text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold text-gray-800">Tokenize Admin Dashboard</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="connectWallet" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                        <i class="fas fa-wallet mr-2"></i>Connect Wallet
+                    </button>
+                    <div id="walletAddress" class="hidden text-sm text-gray-600 font-mono">
+                        0x...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="contract-card bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">ERC-20 Payments</h3>
+                    <i class="fas fa-exchange-alt text-green-500 text-xl"></i>
+                </div>
+                <p class="text-2xl font-bold text-gray-900 mb-2" id="erc20Status">LIVE</p>
+                <p class="text-sm text-gray-600">Cross-Border USDC Payments</p>
+                <div class="mt-4 flex items-center">
+                    <span class="status-dot bg-green-500"></span>
+                    <span class="text-xs text-gray-600">Verified on Sepolia</span>
+                </div>
+            </div>
+
+            <div class="contract-card bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">ERC-3643 Tokens</h3>
+                    <i class="fas fa-coins text-blue-500 text-xl"></i>
+                </div>
+                <p class="text-2xl font-bold text-gray-900 mb-2" id="erc3643Status">LIVE</p>
+                <p class="text-sm text-gray-600">Security Token Platform</p>
+                <div class="mt-4 flex items-center">
+                    <span class="status-dot bg-blue-500"></span>
+                    <span class="text-xs text-gray-600">Verified on Sepolia</span>
+                </div>
+            </div>
+
+            <div class="contract-card bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">ERC-5564 Identity</h3>
+                    <i class="fas fa-id-card text-purple-500 text-xl"></i>
+                </div>
+                <p class="text-2xl font-bold text-gray-900 mb-2" id="erc5564Status">LIVE</p>
+                <p class="text-sm text-gray-600">Privacy-Preserving KYC</p>
+                <div class="mt-4 flex items-center">
+                    <span class="status-dot bg-purple-500"></span>
+                    <span class="text-xs text-gray-600">Verified on Sepolia</span>
+                </div>
+            </div>
+
+            <div class="contract-card bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">ERC-4337 Wallet</h3>
+                    <i class="fas fa-wallet text-orange-500 text-xl"></i>
+                </div>
+                <p class="text-2xl font-bold text-gray-900 mb-2" id="erc4337Status">LIVE</p>
+                <p class="text-sm text-gray-600">Smart Contract Wallets</p>
+                <div class="mt-4 flex items-center">
+                    <span class="status-dot bg-orange-500"></span>
+                    <span class="text-xs text-gray-600">Verified on Sepolia</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contract Addresses -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Deployed Contracts</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <p class="text-sm font-semibold text-gray-700 mb-2">ERC-20 CrossBorderPayment</p>
+                    <p class="text-xs font-mono text-blue-600 break-all" id="erc20Address">Loading...</p>
+                    <button onclick="copyToClipboard('erc20Address')" class="mt-2 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded transition">
+                        <i class="fas fa-copy mr-1"></i>Copy
+                    </button>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <p class="text-sm font-semibold text-gray-700 mb-2">ERC-3643 SecurityToken</p>
+                    <p class="text-xs font-mono text-blue-600 break-all" id="erc3643Address">Loading...</p>
+                    <button onclick="copyToClipboard('erc3643Address')" class="mt-2 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded transition">
+                        <i class="fas fa-copy mr-1"></i>Copy
+                    </button>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <p class="text-sm font-semibold text-gray-700 mb-2">ERC-5564 IdentityRegistry</p>
+                    <p class="text-xs font-mono text-blue-600 break-all" id="erc5564Address">Loading...</p>
+                    <button onclick="copyToClipboard('erc5564Address')" class="mt-2 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded transition">
+                        <i class="fas fa-copy mr-1"></i>Copy
+                    </button>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <p class="text-sm font-semibold text-gray-700 mb-2">ERC-4337 InstitutionWallet</p>
+                    <p class="text-xs font-mono text-blue-600 break-all" id="erc4337Address">Loading...</p>
+                    <button onclick="copyToClipboard('erc4337Address')" class="mt-2 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded transition">
+                        <i class="fas fa-copy mr-1"></i>Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contract Management -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- ERC-20 Management -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-exchange-alt text-green-500 mr-2"></i>
+                    ERC-20 Payment Management
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Daily Transfer Limit (USDC)</label>
+                        <input type="number" id="dailyLimit" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Enter limit">
+                    </div>
+                    <button onclick="setDailyLimit()" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                        <i class="fas fa-sliders-h mr-2"></i>Set Daily Limit
+                    </button>
+                </div>
+            </div>
+
+            <!-- ERC-3643 Management -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-coins text-blue-500 mr-2"></i>
+                    ERC-3643 Token Management
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Investor Address</label>
+                        <input type="text" id="investorAddress" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0x...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Action</label>
+                        <select id="investorAction" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="verify">Verify Identity</option>
+                            <option value="whitelist">Whitelist for Trading</option>
+                            <option value="blacklist">Blacklist</option>
+                            <option value="accredit">Set Accreditation Level</option>
+                        </select>
+                    </div>
+                    <button onclick="manageInvestor()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                        <i class="fas fa-user-check mr-2"></i>Execute Action
+                    </button>
+                </div>
+            </div>
+
+            <!-- ERC-5564 Management -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-id-card text-purple-500 mr-2"></i>
+                    ERC-5564 Identity Management
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Subject Hash</label>
+                        <input type="text" id="subjectHash" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="0x...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Verification Type</label>
+                        <select id="verificationType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="zk">ZK Proof Verification</option>
+                            <option value="kyc">Traditional KYC</option>
+                        </select>
+                    </div>
+                    <button onclick="verifyIdentity()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                        <i class="fas fa-shield-alt mr-2"></i>Verify Identity
+                    </button>
+                </div>
+            </div>
+
+            <!-- ERC-4337 Management -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-wallet text-orange-500 mr-2"></i>
+                    ERC-4337 Wallet Management
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Address to Sponsor</label>
+                        <input type="text" id="sponsorAddress" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="0x...">
+                    </div>
+                    <button onclick="sponsorAddress()" class="w-full bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                        <i class="fas fa-gas-pump mr-2"></i>Sponsor Gas
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Activity Log</h2>
+            <div id="activityLog" class="space-y-2 max-h-64 overflow-y-auto">
+                <p class="text-sm text-gray-500 italic">No recent activity</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <p class="text-center text-sm text-gray-600">
+                Tokenize Admin Dashboard | Built for Banking Use Cases | 
+                <a href="https://sepolia.etherscan.io/" target="_blank" class="text-blue-600 hover:underline">View on Sepolia Etherscan</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script>
+        // Contract addresses (from deployment)
+        const CONTRACT_ADDRESSES = {
+            erc20: '0x59f40d0e94cbad4B8a71A5fb9507865e391d0357',
+            erc3643: '0xb0D7D3b47e562790b1DF004350eFc38A2FAB8cdd',
+            erc5564: '0xCA9Be17DF59596B19F933408510e1e827D394541',
+            erc4337: '0x6CAC545a8CABD31a409Eeb7A3595B6590562B09b'
+        };
+
+        // ABI definitions (simplified for demo)
+        const ABIS = {
+            erc20: [{"inputs":[],"name":"setDailyLimit","outputs":[],"stateMutability":"nonpayable","type":"function"}],
+            erc3643: [{"inputs":[{"internalType":"address","name":"investor","type":"address"},{"internalType":"bool","name":"verified","type":"boolean"}],"name":"setIdentityVerified","outputs":[],"stateMutability":"nonpayable","type":"function"}],
+            erc5564: [{"inputs":[{"internalType":"bytes32","name":"subjectHash","type":"bytes32"},{"internalType":"uint8","name":"accreditationLevel","type":"uint8"}],"name":"verifyIdentity","outputs":[],"stateMutability":"nonpayable","type":"function"}],
+            erc4337: [{"inputs":[{"internalType":"address","name":"addr","type":"address"}],"name":"sponsorAddress","outputs":[],"stateMutability":"nonpayable","type":"function"}]
+        };
+
+        let provider, signer, contracts = {};
+
+        // Initialize dashboard
+        function initDashboard() {
+            document.getElementById('erc20Address').textContent = CONTRACT_ADDRESSES.erc20;
+            document.getElementById('erc3643Address').textContent = CONTRACT_ADDRESSES.erc3643;
+            document.getElementById('erc5564Address').textContent = CONTRACT_ADDRESSES.erc5564;
+            document.getElementById('erc4337Address').textContent = CONTRACT_ADDRESSES.erc4337;
+        }
+
+        // Connect wallet
+        document.getElementById('connectWallet').addEventListener('click', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    
+                    const address = await signer.getAddress();
+                    document.getElementById('walletAddress').textContent = address.substring(0, 6) + '...' + address.substring(address.length - 4);
+                    document.getElementById('walletAddress').classList.remove('hidden');
+                    document.getElementById('connectWallet').textContent = 'Connected';
+                    
+                    addActivity('Wallet connected: ' + address);
+                } catch (error) {
+                    console.error('Connection error:', error);
+                    alert('Failed to connect wallet: ' + error.message);
+                }
+            } else {
+                alert('Please install MetaMask or another Web3 wallet!');
+            }
+        });
+
+        // Copy to clipboard
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                addActivity('Copied address: ' + text);
+            });
+        }
+
+        // Set daily limit (ERC-20)
+        async function setDailyLimit() {
+            if (!signer) {
+                alert('Please connect wallet first!');
+                return;
+            }
+
+            const limit = document.getElementById('dailyLimit').value;
+            if (!limit || limit <= 0) {
+                alert('Please enter a valid limit!');
+                return;
+            }
+
+            try {
+                const contract = new ethers.Contract(CONTRACT_ADDRESSES.erc20, ABIS.erc20, signer);
+                const tx = await contract.setDailyLimit(limit);
+                await tx.wait();
+                addActivity('Daily limit set to ' + limit + ' USDC');
+                alert('Daily limit updated successfully!');
+            } catch (error) {
+                console.error('Error setting daily limit:', error);
+                alert('Failed to set daily limit: ' + error.message);
+            }
+        }
+
+        // Manage investor (ERC-3643)
+        async function manageInvestor() {
+            if (!signer) {
+                alert('Please connect wallet first!');
+                return;
+            }
+
+            const address = document.getElementById('investorAddress').value;
+            const action = document.getElementById('investorAction').value;
+
+            if (!address || !ethers.utils.isAddress(address)) {
+                alert('Please enter a valid Ethereum address!');
+                return;
+            }
+
+            try {
+                let contract, tx;
+                
+                switch(action) {
+                    case 'verify':
+                        contract = new ethers.Contract(CONTRACT_ADDRESSES.erc3643, ABIS.erc3643, signer);
+                        tx = await contract.setIdentityVerified(address, true);
+                        break;
+                    case 'whitelist':
+                        // Simplified - in production would use setWhitelistStatus
+                        alert('Whitelist action requires additional setup');
+                        return;
+                    case 'blacklist':
+                        // Simplified - in production would use blacklistAddress
+                        alert('Blacklist action requires additional setup');
+                        return;
+                    case 'accredit':
+                        // Simplified - in production would use setAccreditationLevel
+                        alert('Accreditation action requires additional setup');
+                        return;
+                }
+
+                await tx.wait();
+                addActivity('Investor ' + address + ' ' + action);
+                alert('Action executed successfully!');
+            } catch (error) {
+                console.error('Error managing investor:', error);
+                alert('Failed to execute action: ' + error.message);
+            }
+        }
+
+        // Verify identity (ERC-5564)
+        async function verifyIdentity() {
+            if (!signer) {
+                alert('Please connect wallet first!');
+                return;
+            }
+
+            const subjectHash = document.getElementById('subjectHash').value;
+            const verificationType = document.getElementById('verificationType').value;
+
+            if (!subjectHash || !ethers.utils.isHexString(subjectHash, 32)) {
+                alert('Please enter a valid subject hash!');
+                return;
+            }
+
+            try {
+                // Simplified - in production would use proper verification logic
+                addActivity('Identity verification initiated for: ' + subjectHash);
+                alert('Identity verification initiated! (Demo mode)');
+            } catch (error) {
+                console.error('Error verifying identity:', error);
+                alert('Failed to verify identity: ' + error.message);
+            }
+        }
+
+        // Sponsor address (ERC-4337)
+        async function sponsorAddress() {
+            if (!signer) {
+                alert('Please connect wallet first!');
+                return;
+            }
+
+            const address = document.getElementById('sponsorAddress').value;
+            
+            if (!address || !ethers.utils.isAddress(address)) {
+                alert('Please enter a valid Ethereum address!');
+                return;
+            }
+
+            try {
+                const contract = new ethers.Contract(CONTRACT_ADDRESSES.erc4337, ABIS.erc4337, signer);
+                const tx = await contract.sponsorAddress(address);
+                await tx.wait();
+                addActivity('Sponsored address: ' + address);
+                alert('Address sponsored successfully!');
+            } catch (error) {
+                console.error('Error sponsoring address:', error);
+                alert('Failed to sponsor address: ' + error.message);
+            }
+        }
+
+        // Add activity log entry
+        function addActivity(message) {
+            const log = document.getElementById('activityLog');
+            const entry = document.createElement('div');
+            entry.className = 'text-sm text-gray-700 border-l-2 border-blue-500 pl-3 py-1';
+            
+            const timestamp = new Date().toLocaleTimeString();
+            entry.innerHTML = `<span class="text-xs text-gray-500">[${timestamp}]</span> ${message}`;
+            
+            log.insertBefore(entry, log.firstChild);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', initDashboard);
+    </script>
+</body>
+</html>
