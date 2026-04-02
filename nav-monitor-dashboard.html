@@ -45,6 +45,9 @@
                         <span class="status-indicator bg-green-500 pulse-dot"></span>
                         <span class="text-sm text-gray-600">Live</span>
                     </div>
+                    <a href="admin-dashboard.html" class="text-blue-600 hover:text-blue-800 font-medium transition duration-200">
+                        <i class="fas fa-tachometer-alt mr-1"></i> Admin Dashboard
+                    </a>
                     <button onclick="refreshData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
                         <i class="fas fa-sync-alt mr-2"></i>Refresh
                     </button>
@@ -459,5 +462,32 @@
             }
         }, 5000);
     </script>
+
+    <!-- Footer Navigation -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-center space-x-6">
+                <a href="admin-dashboard.html" class="text-blue-600 hover:text-blue-800 font-medium transition duration-200 flex items-center">
+                    <i class="fas fa-tachometer-alt mr-2"></i> Admin Dashboard
+                </a>
+                <span class="text-gray-400">|</span>
+                <a href="nav-monitor-dashboard.html" class="text-blue-600 hover:text-blue-800 font-medium transition duration-200 flex items-center">
+                    <i class="fas fa-chart-line mr-2"></i> NAV Monitor
+                </a>
+                <span class="text-gray-400">|</span>
+                <a href="index.html" class="text-blue-600 hover:text-blue-800 font-medium transition duration-200 flex items-center">
+                    <i class="fas fa-home mr-2"></i> Home
+                </a>
+            </div>
+            <div class="text-center mt-4 text-sm text-gray-500">
+                <p>&copy; 2026 Tokenize Platform. All rights reserved.</p>
+                <p class="mt-1">
+                    <a href="https://github.com/bnuyts/tokenize-dashboard" target="_blank" class="hover:text-blue-600">
+                        <i class="fab fa-github mr-1"></i> View on GitHub
+                    </a>
+                </p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
