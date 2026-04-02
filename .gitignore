@@ -28,3 +28,6 @@ npm-debug.log*
 # Testing
 test-results/
 
+# Hide all Markdown files (only show HTML)
+*.md
+
